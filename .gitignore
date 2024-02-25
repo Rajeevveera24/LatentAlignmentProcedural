@@ -6,3 +6,6 @@ venvs/
 
 ## Data files
 data/
+
+## Output files
+outputs/

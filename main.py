@@ -3,7 +3,8 @@ import flair
 from flair.data import Sentence
 import pickle
 from flair.models import SequenceTagger
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings, BertEmbeddings, XLNetEmbeddings
+from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings#, XLNetEmbeddings
+from flair.embeddings import TransformerWordEmbeddings as BertEmbeddings
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -576,7 +577,7 @@ if __name__ == "__main__":
     resnet.eval()
 
     #define the transformers for the picture
-    scaler = transforms.Scale((224, 224))
+    scaler = transforms.Resize((224, 224))
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225])
     to_tensor = transforms.ToTensor()
@@ -633,15 +634,15 @@ if __name__ == "__main__":
         answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
         imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
         
-    if _set == "train":
-        images_representation = np.load('train_image_resnet50.npy')
-        with open('train_image_resnet50.json', 'r') as f:
-            images_id = json.load(f)
+    # if _set == "train":
+    #     images_representation = np.load('train_image_resnet50.npy')
+    #     with open('train_image_resnet50.json', 'r') as f:
+    #         images_id = json.load(f)
 
 
-    elif _set == "test":
-        images_representation = np.load('test_image_resnet50.npy')
-        with open('test_image_resnet50.json', 'r') as f:
-            images_id = json.load(f)
+    # elif _set == "test":
+    #     images_representation = np.load('test_image_resnet50.npy')
+    #     with open('test_image_resnet50.json', 'r') as f:
+    #         images_id = json.load(f)
             
     main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

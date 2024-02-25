@@ -110,7 +110,7 @@ def prepare_data(_set="train"):
         valid, val_visual_cloze, val_visual_coherence, val_visual_ordering, val_textual_cloze = read_data(file="val.json")
         return valid, val_visual_cloze, val_visual_coherence, val_visual_ordering, val_textual_cloze
     elif _set == "test":
-        test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze = read_data(file="test.json")
+        test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze = read_data(file="data/recipeqa-test.json")
         return test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze
 
 #Pre-Processing
@@ -497,6 +497,7 @@ def main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, 
     
     #check for the loading parameters
     if load:
+        print("Loading the existing parameters of the models")
         LSTM_Lang.load_state_dict(torch.load(save_path + "LANGL"))
         LSTM_Img.load_state_dict(torch.load(save_path + "IMGL"))
         LSTM_Answer.load_state_dict(torch.load(save_path + "ANSWERL"))
@@ -645,4 +646,5 @@ if __name__ == "__main__":
     #     with open('test_image_resnet50.json', 'r') as f:
     #         images_id = json.load(f)
             
+    load = False
     main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

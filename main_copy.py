@@ -628,6 +628,6 @@ if __name__ == "__main__":
     #     with open('test_image_resnet50.json', 'r') as f:
     #         images_id = json.load(f)
             
-    load = False
+    load = True
 
     main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

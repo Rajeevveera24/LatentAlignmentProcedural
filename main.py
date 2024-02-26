@@ -3,7 +3,8 @@ import flair
 from flair.data import Sentence
 import pickle
 from flair.models import SequenceTagger
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings, BertEmbeddings, XLNetEmbeddings
+from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings#, XLNetEmbeddings
+from flair.embeddings import TransformerWordEmbeddings as BertEmbeddings
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -109,14 +110,15 @@ def prepare_data(_set="train"):
         valid, val_visual_cloze, val_visual_coherence, val_visual_ordering, val_textual_cloze = read_data(file="val.json")
         return valid, val_visual_cloze, val_visual_coherence, val_visual_ordering, val_textual_cloze
     elif _set == "test":
-        test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze = read_data(file="test.json")
+        test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze = read_data(file="data/recipeqa-test.json")
         return test, test_visual_cloze, test_visual_coherence, test_visual_ordering, test_textual_cloze
 
 #Pre-Processing
 
 def sentence_split(text, properties={'annotators': 'ssplit', 'outputFormat': 'json'}):
     """Split sentence using Stanford NLP"""
-    annotated = nlp.annotate(text, properties)
+    ## AddedJSON Loads wrapper since the core nlp server returns a string 
+    annotated = json.loads(nlp.annotate(text, properties))
     sentence_split = list()
     for sentence in annotated['sentences']:
         s = [t['word'] for t in sentence['tokens']]
@@ -496,6 +498,7 @@ def main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, 
     
     #check for the loading parameters
     if load:
+        print("Loading the existing parameters of the models")
         LSTM_Lang.load_state_dict(torch.load(save_path + "LANGL"))
         LSTM_Img.load_state_dict(torch.load(save_path + "IMGL"))
         LSTM_Answer.load_state_dict(torch.load(save_path + "ANSWERL"))
@@ -539,107 +542,110 @@ def main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, 
     
     execute(mode, number, _set, iteration, data_tc, base_image_path, log_file, cuda_option, save_path, loss_mode, learning_rate, score_mode, max_pool)
 
-    
-# define nlp stanford library
-nlp = StanfordCoreNLP('http://localhost:9000')
-properties={
-  'annotators': 'ssplit',
-  'outputFormat': 'json'
-  }
 
-#Getting user arguments
-mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, embedding_type, loss_mode, learning_rate, score_mode, max_pool, args = parse_arguments()
+if __name__ == "__main__":
 
+    # define nlp stanford library
+    nlp = StanfordCoreNLP('http://localhost:9000')
+    properties={
+    'annotators': 'ssplit',
+    'outputFormat': 'json'
+    }
 
-#define the embeddings
-if embedding_type == 1:
-    selected_embedding = BertEmbeddings()
-    embed_dim = 3072
-elif embedding_type == 2:
-    selected_embedding = FlairEmbeddings("news-forward")
-    embed_dim = 2048
-elif embedding_type == 3:
-    selected_embedding = XLNetEmbeddings()
-    embed_dim = 2048
-    
-bert = BertEmbeddings()
-flair = FlairEmbeddings("news-forward")
-
-# Load the pretrained model of resnet
-resnet = models.resnet101(pretrained=True)
-# Use the model object to select the desired layer
-modules = list(resnet.children())[:-1]
-
-resnet = nn.Sequential(*modules)
-resnet.eval()
-
-#define the transformers for the picture
-scaler = transforms.Scale((224, 224))
-normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-to_tensor = transforms.ToTensor()
-
-is_cuda = torch.cuda.is_available()
-
-#define the language part 
-LSTM_Lang = LSTMFlair(input_dim=embed_dim, hidden_dim=2048, batch_size = 1)
-
-#define the images LSTM  
-LSTM_Img = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
-
-#define the Answers LSTM
-LSTM_Answer = LSTMFlair(input_dim=embed_dim+4, hidden_dim=2048, batch_size = 1)  
-
-#define the fully connected instances 
-# if architecture == 1:
-#     contextTransformer = HighwayResidualFC(size=4096, num_layers=5, f=F.leaky_relu, dims=[4096, 2048, 1024, 512, 512], layers=4)
-#     answerTransformer = HighwayResidualFC(size=2048, num_layers=5, f=F.leaky_relu, dims=[2048, 1024, 1024, 512, 512], layers=4)
-# elif architecture == 2:
-#     contextTransformer = HighwayFC(size=4096, num_layers=5, f=F.leaky_relu, dims=[4096, 2048, 1024, 512, 512], layers=4)
-#     answerTransformer = HighwayFC(size=2048, num_layers=5, f=F.leaky_relu, dims=[2048, 1024, 1024, 512, 512], layers=4)
-# elif architecture == 3:
-#     contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 1024, 512, 512], layers = 4)
-#     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)        
-# elif architecture == 4:
-#     contextTransformer = FullyConnected(dims = [4096, 2048, 1024, 512, 512], layers = 4)
-#     answerTransformer = FullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)  
-# elif architecture == 5:
-#     contextTransformer = ResidualFullyConnected(dims = [2048, 2048, 2048, 512, 512], layers = 4)
-#     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-#     imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-# elif architecture == 6:
-#     contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 2048, 512, 512], layers = 4)
-#     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-#     imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    
-if architecture == 7:
-    contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 2048, 512, 512], layers = 4)
-    answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-#     lxrt_pooler = BertPooler(hidden_size=embed_dim)
-
-elif architecture == 8:
-    multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
-    LSTM_Lang = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
-    textTransformer = FullyConnected(dims = [embed_dim, 2048, 2048], layers = 2)
-    contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 1024, 512, 512], layers = 4)
-    answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-
-elif architecture == 9:
-    contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 2048, 512, 512], layers = 4)
-    answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    
-if _set == "train":
-    images_representation = np.load('train_image_resnet50.npy')
-    with open('train_image_resnet50.json', 'r') as f:
-        images_id = json.load(f)
+    #Getting user arguments
+    mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, embedding_type, loss_mode, learning_rate, score_mode, max_pool, args = parse_arguments()
 
 
-elif _set == "test":
-    images_representation = np.load('test_image_resnet50.npy')
-    with open('test_image_resnet50.json', 'r') as f:
-        images_id = json.load(f)
+    #define the embeddings
+    if embedding_type == 1:
+        selected_embedding = BertEmbeddings()
+        embed_dim = 3072
+    elif embedding_type == 2:
+        selected_embedding = FlairEmbeddings("news-forward")
+        embed_dim = 2048
+    elif embedding_type == 3:
+        selected_embedding = XLNetEmbeddings()
+        embed_dim = 2048
         
-main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)
+    bert = BertEmbeddings()
+    flair = FlairEmbeddings("news-forward")
+
+    # Load the pretrained model of resnet
+    resnet = models.resnet101(pretrained=True)
+    # Use the model object to select the desired layer
+    modules = list(resnet.children())[:-1]
+
+    resnet = nn.Sequential(*modules)
+    resnet.eval()
+
+    #define the transformers for the picture
+    scaler = transforms.Resize((224, 224))
+    normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                    std=[0.229, 0.224, 0.225])
+    to_tensor = transforms.ToTensor()
+
+    is_cuda = torch.cuda.is_available()
+
+    #define the language part 
+    LSTM_Lang = LSTMFlair(input_dim=embed_dim, hidden_dim=2048, batch_size = 1)
+
+    #define the images LSTM  
+    LSTM_Img = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
+
+    #define the Answers LSTM
+    LSTM_Answer = LSTMFlair(input_dim=embed_dim+4, hidden_dim=2048, batch_size = 1)  
+
+    #define the fully connected instances 
+    # if architecture == 1:
+    #     contextTransformer = HighwayResidualFC(size=4096, num_layers=5, f=F.leaky_relu, dims=[4096, 2048, 1024, 512, 512], layers=4)
+    #     answerTransformer = HighwayResidualFC(size=2048, num_layers=5, f=F.leaky_relu, dims=[2048, 1024, 1024, 512, 512], layers=4)
+    # elif architecture == 2:
+    #     contextTransformer = HighwayFC(size=4096, num_layers=5, f=F.leaky_relu, dims=[4096, 2048, 1024, 512, 512], layers=4)
+    #     answerTransformer = HighwayFC(size=2048, num_layers=5, f=F.leaky_relu, dims=[2048, 1024, 1024, 512, 512], layers=4)
+    # elif architecture == 3:
+    #     contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 1024, 512, 512], layers = 4)
+    #     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)        
+    # elif architecture == 4:
+    #     contextTransformer = FullyConnected(dims = [4096, 2048, 1024, 512, 512], layers = 4)
+    #     answerTransformer = FullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)  
+    # elif architecture == 5:
+    #     contextTransformer = ResidualFullyConnected(dims = [2048, 2048, 2048, 512, 512], layers = 4)
+    #     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+    #     imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+    # elif architecture == 6:
+    #     contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 2048, 512, 512], layers = 4)
+    #     answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+    #     imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+        
+    if architecture == 7:
+        contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 2048, 512, 512], layers = 4)
+        answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+        imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+    #     lxrt_pooler = BertPooler(hidden_size=embed_dim)
+
+    elif architecture == 8:
+        multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
+        LSTM_Lang = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
+        textTransformer = FullyConnected(dims = [embed_dim, 2048, 2048], layers = 2)
+        contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 1024, 512, 512], layers = 4)
+        answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+        imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+
+    elif architecture == 9:
+        contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 2048, 512, 512], layers = 4)
+        answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+        imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+        
+    # if _set == "train":
+    #     images_representation = np.load('train_image_resnet50.npy')
+    #     with open('train_image_resnet50.json', 'r') as f:
+    #         images_id = json.load(f)
+
+
+    # elif _set == "test":
+    #     images_representation = np.load('test_image_resnet50.npy')
+    #     with open('test_image_resnet50.json', 'r') as f:
+    #         images_id = json.load(f)
+            
+    load = False
+    main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

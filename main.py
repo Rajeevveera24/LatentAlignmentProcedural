@@ -117,7 +117,8 @@ def prepare_data(_set="train"):
 
 def sentence_split(text, properties={'annotators': 'ssplit', 'outputFormat': 'json'}):
     """Split sentence using Stanford NLP"""
-    annotated = nlp.annotate(text, properties)
+    ## AddedJSON Loads wrapper since the core nlp server returns a string 
+    annotated = json.loads(nlp.annotate(text, properties))
     sentence_split = list()
     for sentence in annotated['sentences']:
         s = [t['word'] for t in sentence['tokens']]

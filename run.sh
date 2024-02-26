@@ -1,6 +1,7 @@
 #!/bin/bash
 
-python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 9 -e 2 -o 1 -r 0.001 -x True
+python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 9 -e 2 -o one -r 0.001 -x True
+python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 9 -e 2 -o all -r 0.001 -x True
 # -m for the mode of "train" or "test"
 # -s for the set  of "train", "test" or "valid"
 # -l for using the stored models or not (-l True)

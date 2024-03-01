@@ -257,7 +257,7 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                     for item in images_list[info]:
                         _id = images_id[item]
                         check = True
-                        im_tensor.append(torch.from_numpy(images_representation[_id]).to(cuda_option))
+                        im_tensor.append(torch.from_numpy(images_representation[_id]).float().to(cuda_option))
                     if check:
 #                         print("here")
                         img_data.append(torch.stack(im_tensor))
@@ -616,18 +616,29 @@ if __name__ == "__main__":
         contextTransformer = ResidualFullyConnected(dims = [4096, 2048, 2048, 512, 512], layers = 4)
         answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
         imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-        
-    # if _set == "train":
-    #     images_representation = np.load('train_image_resnet50.npy')
-    #     with open('train_image_resnet50.json', 'r') as f:
-    #         images_id = json.load(f)
+    
+    train_image_ids_map = 'data/train_image_id_mapping.json'
+    test_image_ids_map = 'data/test_image_id_mapping.json'
+    train_embeddings_load_path = 'data/embeddings/images/train_image_embeddings.npy'
+    test_embeddings_load_path = 'data/embeddings/images/test_image_embeddings.npy'
+    
+    if _set == "train":
+        images_representation = np.load(train_embeddings_load_path, allow_pickle=True).astype(np.float16)
+        # images_representation = torch.from_numpy(images_representation).float()
+        print("Successfully loaded train image embeddings with shape ", images_representation.shape)
+        with open(train_image_ids_map, 'r') as f:
+            images_id = json.load(f)
+            print("Successfully loaded train image ids with length ", len(images_id))
 
 
-    # elif _set == "test":
-    #     images_representation = np.load('test_image_resnet50.npy')
-    #     with open('test_image_resnet50.json', 'r') as f:
-    #         images_id = json.load(f)
+    elif _set == "test":
+        images_representation = np.load(test_embeddings_load_path, allow_pickle=True).astype(np.float16)
+        # images_representation = torch.from_numpy(images_representation).float() 
+        print("Successfully loaded test image embeddings with shape ", images_representation.shape)
+        with open(test_image_ids_map, 'r') as f:
+            images_id = json.load(f)
+            print("Successfully loaded test image ids with length ", len(images_id))
             
     load = False
-
+    
     main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

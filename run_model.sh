@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 9 -e 2 -o all -r 0.001 -x True
-python main.py -i 20 -n 1000 -m train -s train -l False -c 0 -p save/ -f outputs/log.txt -a 9 -e 2 -o all -r 0.001 -x True
+# python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 7 -e 2 -o all -r 0.001 -x True
+python main.py -i 20 -n 1000 -m train -s train -l False -c 0 -p save/ -f outputs/log.txt -a 8 -e 2 -o one -r 0.001 -x True
 
 # -i for number of iterations
 # -n for number of samples in use

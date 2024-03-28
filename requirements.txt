@@ -53,6 +53,7 @@ pptree==3.1
 protobuf==4.25.3
 psutil==5.9.8
 pycorenlp==0.3.0
+pylzma==0.5.0
 pyparsing==3.1.1
 PySocks==1.7.1
 python-dateutil==2.8.2

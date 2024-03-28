@@ -1,4 +1,4 @@
-import json
+import json, gc
 import flair
 from flair.data import Sentence
 import pickle
@@ -229,6 +229,9 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
         passed = 0
         
         for ind in tqdm(range(0, _n)):
+            if (ind+1) % 500 == 0:
+                gc.collect()
+                torch.cuda.empty_cache()
             
             print("sample number: ", ind, file=logger)
             sample = _d[ind]

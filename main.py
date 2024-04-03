@@ -588,7 +588,6 @@ if __name__ == "__main__":
 
     resnet = models.resnet101(pretrained=True)
     modules = list(resnet.children())[:-1]
-
     resnet = nn.Sequential(*modules)
     resnet.eval()
 

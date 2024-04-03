@@ -1,9 +1,7 @@
-import json
+import json, gc
 import flair
 from flair.data import Sentence
-import pickle
-from flair.models import SequenceTagger
-from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings#, XLNetEmbeddings
+from flair.embeddings import WordEmbeddings, FlairEmbeddings, StackedEmbeddings
 from flair.embeddings import TransformerWordEmbeddings as BertEmbeddings
 import torch
 import torch.nn as nn
@@ -13,19 +11,14 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from PIL import Image
 from tqdm import tqdm
-import string
 from pycorenlp import StanfordCoreNLP
-from os import path
 import argparse
 import torch.optim as optim
-from src.models import LSTMFlair, FullyConnected, Highway, ResidualFullyConnected, HighwayResidualFC, HighwayFC
+from src.models import LSTMFlair, FullyConnected, ResidualFullyConnected
 import random
 import numpy as np
 import operator
 from src.bertModel import NoPosLXRTEncoder
-import nltk
-import math
-from src.single_transformer import TransformerBlock
 
 
 def parse_arguments(mode="train", number=200, _set="train", load=False, iteration=1, cuda=0, path="saves/", log="saves/log.txt", architecture=1, embedding_type=1, loss_mode="all", learning_rate=0.1, score_mode="max", max_pool=True): 
@@ -35,7 +28,7 @@ def parse_arguments(mode="train", number=200, _set="train", load=False, iteratio
     parser.add_argument('-n','--number',help='Number of examples', type=int, required=False)
     parser.add_argument('-i','--iteration',help='Number of iterations', type=int, required=False)
     parser.add_argument('-s','--set',help='Working on which set', required=False)
-    parser.add_argument('-l','--load',help='Load or not', type=bool, required=False)
+    parser.add_argument('-l','--load',help='Load or not', type=bool, required=False, default=False)
     parser.add_argument('-c', '--cuda', help='Cuda option', type=int, required=False)
     parser.add_argument('-p', '--path', help='Save and Load path', required=False)
     parser.add_argument('-f', '--file', help='Log file name', required=False)
@@ -54,8 +47,7 @@ def parse_arguments(mode="train", number=200, _set="train", load=False, iteratio
         number = args.number
     if args.set and args.set in ["test", "train", "valid"]:
         _set = args.set
-    if args.load:
-        load = args.load
+    load = args.load
     if args.iteration:
         iteration = args.iteration
     if args.cuda in [0, 1, 2, 3, 4, 5, 6]:
@@ -85,7 +77,6 @@ def parse_arguments(mode="train", number=200, _set="train", load=False, iteratio
 def read_data(file="train.json"):
     with open(file, 'r') as myfile:
         data = myfile.read()
-    # parse file
     info = json.loads(data)
     
     visual_coherence = [data for data in info['data'] if data['task']=="visual_coherence"]
@@ -208,7 +199,7 @@ def prepare_answer(texts, embedder, cuda_option):
     return data
 
 #execution code for training and testing
-def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, save_path, loss_mode, learning_rate, score_mode, max_pool):
+def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_option, save_path, loss_mode, learning_rate, score_mode, max_pool):
     
     if _m == "train":
         params = list(answerTransformer.parameters()) + list(contextTransformer.parameters()) + list(imageTransformer.parameters())
@@ -228,10 +219,11 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
         p2 = 0
         passed = 0
         
-        for ind in tqdm(range(0, _n)):
-            
+        indices = np.random.randint(0, len(dataset), _n)
+
+        for ind in tqdm(indices):
             print("sample number: ", ind, file=logger)
-            sample = _d[ind]
+            sample = dataset[ind]
             print("sample id: ", sample['recipe_id'], file=logger)
             
             if _m == "train":
@@ -241,31 +233,27 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                 contextTransformer.zero_grad()
                 answerTransformer.zero_grad()
                 imageTransformer.zero_grad()
-                
+
                 if architecture == 8:
                     multicoder.zero_grad()
                     textTransformer.zero_grad()
                 
-            #Add after having the images
-            #prepare the images
             if architecture == 7 or architecture == 8:
-                images_list = [image['images'] for image in sample['context']]
+                images_list = [instruction_step['images'] for instruction_step in sample['context']]
                 img_data = []
                 for info in range(len(images_list)):
-                    im_tensor = []
+                    image_tensor = []
                     check = False
                     for item in images_list[info]:
                         _id = images_id[item]
                         check = True
-                        im_tensor.append(torch.from_numpy(images_representation[_id]).float().to(cuda_option))
+                        image_tensor.append(torch.from_numpy(images_representation[_id]).float().to(cuda_option))
                     if check:
-#                         print("here")
-                        img_data.append(torch.stack(im_tensor))
+                        img_data.append(torch.stack(image_tensor))
                     else:
                         img_data.append([])
 
-            #prepare the instructions
-            instructions = [text['body'] for text in sample['context']]
+            instructions = [instruction_step['body'] for instruction_step in sample['context']]
 
             #prepare Question
             placeholder = 0
@@ -285,14 +273,14 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                 print(sample['question'])
                 raise
 
-            #prepare answers pairs
             answers = []
-            for item in sample['choice_list']:
-                answers.append([item, g_placeholder])
+            for answer_choice in sample['choice_list']:
+                answers.append([answer_choice, g_placeholder])
             correct_answer = [sample['choice_list'][sample['answer']], g_placeholder]
             del answers[sample['answer']]
-            _list = []
             
+            # Delete Empty Answers
+            _list = []
             for _it in range(len(answers)):
                 try:
                     if answers[_it][0] == "" or answers[_it][0] == " ":
@@ -300,9 +288,10 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                 except:
                     print(_it)
                     raise
-            
             for item in _list:
                 del answers[item]
+
+
             answers_results = []
             answers_results.append(LSTM_Answer(prepare_answer(texts=[correct_answer], embedder = selected_embedding, cuda_option = cuda_option))[-1][-1])
             
@@ -314,6 +303,8 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
             results = []
             
             try:
+                pre_similarities = []
+                post_similarities = []
                 for _it in range(len(instructions)):
                     sentences = preprocess(instructions[_it])
 #                     sentences_result = torch.zeros(2048).cuda(cuda_option)
@@ -347,10 +338,37 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                         if len(img_data[_it]):
     #                         print("all text shape is: ", all_text.unsqueeze(0).shape)
     #                         print("images shape is: ", img_data[_it].unsqueeze(0).shape)
+                            # if
+                            sentences_result = LSTM_Lang(all_text.unsqueeze(0))[-1][-1]
+                            image_result = LSTM_Img(img_data[_it].unsqueeze(0))[-1][-1]
+                            t1 = sentences_result.detach().cpu().numpy()
+                            t2 = image_result.detach().cpu().numpy()
+                            sentence_embedding = t1
+                            image_embedding = t2
+                            # print(sentence_embedding.shape, image_embedding.shape)
+                            dot_product = np.dot(sentence_embedding, image_embedding.T)
+                            norm_a = np.linalg.norm(sentence_embedding)
+                            norm_b = np.linalg.norm(image_embedding)
+                            pre_similarity = dot_product / (norm_a * norm_b)
+                            pre_similarities.append(pre_similarity)
+                            
                             all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),visn_feats=img_data[_it].unsqueeze(0), visn_attention_mask=None, lang_attention_mask=None)
+                            
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
                             image_result = LSTM_Img(vision_input)[-1][-1]
+
+                            t1 = sentences_result.detach().cpu().numpy()
+                            t2 = image_result.detach().cpu().numpy()
+                            sentence_embedding = t1
+                            image_embedding = t2
+                            # print(sentence_embedding.shape, image_embedding.shape)
+                            dot_product = np.dot(sentence_embedding, image_embedding.T)
+                            norm_a = np.linalg.norm(sentence_embedding)
+                            norm_b = np.linalg.norm(image_embedding)
+                            post_similarity = dot_product / (norm_a * norm_b)
+                            post_similarities.append(post_similarity)
                         else:
+                            print("\nNo images for this step")
                             all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),visn_feats=None, visn_attention_mask=None, lang_attention_mask=None)
                             image_result = torch.zeros(2048).cuda(cuda_option)
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
@@ -365,6 +383,7 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                         value = contextTransformer(torch.cat((sentences_result, question_result, image_result)))
                     else:
                         value = contextTransformer(torch.cat((sentences_result, question_result)))
+                    
                     results.append(value)
 
                 results = torch.stack(results)
@@ -407,22 +426,25 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                 print_results_list = []
                 for tt in range(4):
                     print_results_list.append(print_results[tt])
+                
                 print("the matching result is: ", print_results_list, file=logger)
                 print("the predicted answer: ", np.argmax(print_results_list), file=logger)
                 print("The answer is: ", sample['answer'], file=logger)
+                if sample['answer'] == np.argmax(print_results_list):
+                    print("correct Answer", file=logger)
+                else:
+                    print("wrong Answer", file=logger)
+                print(np.mean(np.array(pre_similarities)), np.mean(np.array(post_similarities)), file=logger)
+
                 checking_p2 = torch.tensor(print_results_list).topk(2)[1]
                 if sample['answer'] in checking_p2:
                     p2 += 1
                 if index_most == 0:
                     number_true += 1
-                    print("correct number: ", number_true, file=logger)
+                #     print("correct number: ", number_true, file=logger)
 
                 if _m == "train":
                     if loss_mode == "one":
-    #                     loss = 1 - results[0]
-    #                     ri = random.choice([1, 2, 3])
-    #                     for ind in range(final_results[ri].shape[0]):
-    #                         loss += max(0, final_results[ri][ind] - 0.2)
                         keys = [1, 2, 3]
                         keys = [key for key in keys if key < final_results.shape[0]]
                         ri = random.choice(keys)
@@ -431,7 +453,6 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                             loss += max(0, final_results[key][index0] - results[0] + 0.1)
                         for ind in range(final_results[ri].shape[0]):
                             loss += max(0, results[ri] - results[0] + 0.1)
-                       # print(loss)
                     else:
                         loss = 1- results[0]
                         keys = [1, 2, 3]
@@ -444,6 +465,7 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                         total_loss += loss.item()
                         loss.backward()
                         optimizer.step()
+
             except KeyboardInterrupt:
                 logger.close()
                 raise
@@ -478,6 +500,8 @@ def execute(_m, _n, _s, _iteration, _d, base_image_path, log_file, cuda_option, 
                     torch.save(multicoder.state_dict(), save_path + "step" + str(it) + "_MultiCoder")
                     torch.save(textTransformer.state_dict(), save_path + "step" + str(it) + "_TextT")
             
+            print('\n\n')
+
         print("The ratio of being correct is: ", number_true / (_n - passed))
         print("The ratio of p2 correct is: ", p2 / (_n - passed), file=logger)
         logger.write("The accuracy is "+ str((number_true / (_n - passed))) +". \n")
@@ -547,7 +571,6 @@ def main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, 
         if architecture == 8:
             multicoder.eval()
             textTransformer.eval()
-        
     #define the base address for images
     if _set == "train":
         base_image_path = 'images-qa/train/images-qa/'
@@ -555,7 +578,7 @@ def main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, 
         base_image_path = 'images-qa/test/images-qa/'
     elif _set == "valid":
         base_image_path = 'images-qa/val/images-qa/'
-    
+
     execute(mode, number, _set, iteration, data_tc, base_image_path, log_file, cuda_option, save_path, loss_mode, learning_rate, score_mode, max_pool)
 
 
@@ -583,9 +606,8 @@ if __name__ == "__main__":
     bert = BertEmbeddings()
     flair = FlairEmbeddings("news-forward")
 
-    resnet = models.resnet101(pretrained=True)
+    resnet = models.resnet50(pretrained=True)
     modules = list(resnet.children())[:-1]
-
     resnet = nn.Sequential(*modules)
     resnet.eval()
 
@@ -617,11 +639,10 @@ if __name__ == "__main__":
         answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
         imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
     
-    
     train_image_ids_map = 'data/train_image_id_mapping.json'
     test_image_ids_map = 'data/test_image_id_mapping.json'
-    train_embeddings_load_path = 'data/embeddings/images/train_image_embeddings.npy'
-    test_embeddings_load_path = 'data/embeddings/images/test_image_embeddings.npy'
+    train_embeddings_load_path = 'data/embeddings/images/train_image_embeddings_resnet50.npy'
+    test_embeddings_load_path = 'data/embeddings/images/test_image_embeddings_resnet50.npy'
     
     if _set == "train":
         images_representation = np.load(train_embeddings_load_path, allow_pickle=True).astype(np.float16)
@@ -637,7 +658,6 @@ if __name__ == "__main__":
         with open(test_image_ids_map, 'r') as f:
             images_id = json.load(f)
             print("Successfully loaded test image ids with length ", len(images_id))
-            
-    load = True
-
+    
+    print(load)
     main(mode, number, _set, load, iteration, cuda_option, save_path, log_file, architecture, loss_mode, learning_rate, score_mode, max_pool, args)

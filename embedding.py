@@ -68,14 +68,19 @@ def process_images(base_img_dir: str, json_file : str, save_file_path: str = 'da
 
 train_images_dir = 'data/images/train/images-qa/'
 train_image_ids_map = 'data/train_image_id_mapping.json'
-train_embeddings_path = 'data/embeddings/images/train_image_embeddings.npy'
+train_embeddings_path = 'data/embeddings/images/train_image_embeddings_resnet50.npy'
+
+val_images_dir = 'data/images/val/images-qa/'
+val_image_ids_map = 'data/val_image_id_mapping.json'
+val_embeddings_path = 'data/embeddings/images/val_image_embeddings_resnet50.npy'
 
 test_images_dir = 'data/images/test/images-qa/'
 test_image_ids_map = 'data/test_image_id_mapping.json'
-test_embeddings_path = 'data/embeddings/images/test_image_embeddings.npy'
+test_embeddings_path = 'data/embeddings/images/test_image_embeddings_resnet50.npy'
 
 embeddings = process_images(base_img_dir=test_images_dir, json_file=test_image_ids_map, save_file_path=test_embeddings_path)
 embeddings = process_images(base_img_dir=train_images_dir, json_file=train_image_ids_map, save_file_path=train_embeddings_path)
+# embeddings = process_images(base_img_dir=val_images_dir, json_file=val_image_ids_map, save_file_path=val_embeddings_path)
 
 # print(get_embedding_shape_from_json('data/train_image_id_mapping.json'))
 

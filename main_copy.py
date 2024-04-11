@@ -142,11 +142,9 @@ def embedding(text, embedder):
 
 #getting the vector representation
 def get_vector(model, image_name):
-    # 1. Load the image with Pillow library
     img = Image.open(image_name)
     if img.mode != "RGB":
         img = img.convert("RGB")
-    # 2. Create a PyTorch Variable with the transformed image
     t_img = Variable(normalize(to_tensor(scaler(img))).unsqueeze(0))
     # 6. Run the model on our transformed image
     data = model(t_img)

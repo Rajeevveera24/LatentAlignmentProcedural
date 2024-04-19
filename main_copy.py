@@ -353,8 +353,16 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             norm_b = np.linalg.norm(image_embedding)
                             pre_similarity = dot_product / (norm_a * norm_b)
                             pre_similarities.append(pre_similarity)
-                            
-                            all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),visn_feats=img_data[_it].unsqueeze(0), visn_attention_mask=None, lang_attention_mask=None)
+
+                            # Change dimensions of embeddings (2048 -> 1024) to match VilBERT encoder
+                            linear_projection_down = nn.Linear(2048, 1024)
+                            all_text = linear_projection_down(all_text)
+                            vision_input = linear_projection_down(img_data[_it])
+                            # TODO: need to get attention masks
+                            all_text, vision_input = multicoder(all_text.unsqueeze(0),vision_input.unsqueeze(0), attention_mask1=None, attention_mask2=None)
+                            linear_projection_up = nn.Linear(1024, 2048)
+                            all_text = linear_projection_up(all_text)
+                            vision_input = linear_projection_up(vision_input)
                             
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
                             image_result = LSTM_Img(vision_input)[-1][-1]
@@ -631,7 +639,10 @@ if __name__ == "__main__":
         answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
         imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
     elif architecture == 8:
-        multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
+        #multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
+        # Get pretrained VilBERT encoder
+        vilbert = pretrained.load_predictor("vqa-vilbert")
+        multicoder = vilbert._model.encoder
         LSTM_Lang = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
         textTransformer = FullyConnected(dims = [embed_dim, 2048, 2048], layers = 2)
         contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 1024, 512, 512], layers = 4)

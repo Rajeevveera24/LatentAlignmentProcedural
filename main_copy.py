@@ -21,6 +21,8 @@ import numpy as np
 import operator
 from src.bertModel import NoPosLXRTEncoder
 
+# for vilbert
+from allennlp_models import pretrained
 
 def parse_arguments(mode="train", number=200, _set="train", load=False, iteration=1, cuda=0, path="saves/", log="saves/log.txt", architecture=1, embedding_type=1, loss_mode="all", learning_rate=0.1, score_mode="max", max_pool=True): 
     
@@ -355,16 +357,36 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             pre_similarities.append(pre_similarity)
 
                             # Change dimensions of embeddings (2048 -> 1024) to match VilBERT encoder
-                            linear_projection_down = nn.Linear(2048, 1024)
-                            all_text = linear_projection_down(all_text)
-                            vision_input = linear_projection_down(img_data[_it])
+                            linear_projection_down_img = nn.Linear(2048, 1024).cuda(cuda_option)
+                            linear_projection_down_text = nn.Linear(2048, 768).cuda(cuda_option)
+                      
+                            all_text = linear_projection_down_text(all_text) # has to be 768?
+
+                            vision_input = linear_projection_down_img(img_data[_it])
                             # TODO: need to get attention masks
-                            vision_attention_mask = torch.ones_like(vision_input.unsqueeze(0))
-                            text_attention_mask = torch.ones_like(all_text.unsqueeze(0))
-                            all_text, vision_input = multicoder(all_text.unsqueeze(0),vision_input.unsqueeze(0), attention_mask1=text_attention_mask, attention_mask2=vision_attention_mask)
-                            linear_projection_up = nn.Linear(1024, 2048)
-                            all_text = linear_projection_up(all_text)
-                            vision_input = linear_projection_up(vision_input)
+                            # vision_attention_mask = torch.ones_like(vision_input.unsqueeze(0)).cuda(cuda_option)
+                            vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
+
+                            text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
+                            # print("all text shape:", all_text.unsqueeze(0).shape)
+                            # print("vision attention shape:", vision_attention_mask.shape)
+                            # print("text_attention_mask shape:", text_attention_mask.shape)
+
+                            all_text, vision_input = multicoder(all_text.unsqueeze(0),
+                                                                  vision_input.unsqueeze(0), # needs to be (num_regions, hidden_size )
+                                                                  attention_mask1=text_attention_mask, 
+                                                                  attention_mask2=vision_attention_mask,
+                                                                  output_all_encoded_layers=False)
+                            # print("all text returned:", all_text)
+                            # print("all text return shape", all_text.shape)
+                            # print("vision input returned:", vision_input)
+                            # print("vision input shape", vision_input.shape)
+
+                            linear_projection_up_img = nn.Linear(1024, 2048).cuda(cuda_option)
+                            linear_projection_up_text = nn.Linear(768, 2048).cuda(cuda_option)
+
+                            all_text = linear_projection_up_text(all_text.squeeze(-1))
+                            vision_input = linear_projection_up_img(vision_input.squeeze(-1))
                             
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
                             image_result = LSTM_Img(vision_input)[-1][-1]
@@ -381,7 +403,17 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             post_similarities.append(post_similarity)
                         else:
                             print("\nNo images for this step")
-                            all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),visn_feats=None, visn_attention_mask=None, lang_attention_mask=None)
+                            # all black image (all zeros) 
+                            vision_input = torch.zeros((1,1,1024)).cuda(cuda_option)
+                            text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
+                            vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
+
+                            all_text, vision_input = multicoder(all_text.unsqueeze(0),
+                                                                vision_input, 
+                                                                text_attention_mask, 
+                                                                vision_attention_mask,
+                                                                output_all_encoded_layers=False)
+
                             image_result = torch.zeros(2048).cuda(cuda_option)
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
 
@@ -644,7 +676,7 @@ if __name__ == "__main__":
         #multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
         # Get pretrained VilBERT encoder
         vilbert = pretrained.load_predictor("vqa-vilbert")
-        multicoder = vilbert._model.encoder
+        multicoder = vilbert._model.backbone.encoder
         LSTM_Lang = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
         textTransformer = FullyConnected(dims = [embed_dim, 2048, 2048], layers = 2)
         contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 1024, 512, 512], layers = 4)

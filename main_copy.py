@@ -359,7 +359,9 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             all_text = linear_projection_down(all_text)
                             vision_input = linear_projection_down(img_data[_it])
                             # TODO: need to get attention masks
-                            all_text, vision_input = multicoder(all_text.unsqueeze(0),vision_input.unsqueeze(0), attention_mask1=None, attention_mask2=None)
+                            vision_attention_mask = torch.ones_like(vision_input.unsqueeze(0))
+                            text_attention_mask = torch.ones_like(all_text.unsqueeze(0))
+                            all_text, vision_input = multicoder(all_text.unsqueeze(0),vision_input.unsqueeze(0), attention_mask1=text_attention_mask, attention_mask2=vision_attention_mask)
                             linear_projection_up = nn.Linear(1024, 2048)
                             all_text = linear_projection_up(all_text)
                             vision_input = linear_projection_up(vision_input)

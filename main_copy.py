@@ -363,24 +363,26 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             all_text = linear_projection_down_text(all_text) # has to be 768?
 
                             vision_input = linear_projection_down_img(img_data[_it])
-                            # TODO: need to get attention masks
-                            # vision_attention_mask = torch.ones_like(vision_input.unsqueeze(0)).cuda(cuda_option)
-                            vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
 
-                            text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
-                            # print("all text shape:", all_text.unsqueeze(0).shape)
-                            # print("vision attention shape:", vision_attention_mask.shape)
-                            # print("text_attention_mask shape:", text_attention_mask.shape)
+                            with torch.no_grad():
+                              # TODO: need to get attention masks
+                              # vision_attention_mask = torch.ones_like(vision_input.unsqueeze(0)).cuda(cuda_option)
+                              vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
 
-                            all_text, vision_input = multicoder(all_text.unsqueeze(0),
-                                                                  vision_input.unsqueeze(0), # needs to be (num_regions, hidden_size )
-                                                                  attention_mask1=text_attention_mask, 
-                                                                  attention_mask2=vision_attention_mask,
-                                                                  output_all_encoded_layers=False)
-                            # print("all text returned:", all_text)
-                            # print("all text return shape", all_text.shape)
-                            # print("vision input returned:", vision_input)
-                            # print("vision input shape", vision_input.shape)
+                              text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
+                              # print("all text shape:", all_text.unsqueeze(0).shape)
+                              # print("vision attention shape:", vision_attention_mask.shape)
+                              # print("text_attention_mask shape:", text_attention_mask.shape)
+
+                              all_text, vision_input = multicoder(all_text.unsqueeze(0),
+                                                                    vision_input.unsqueeze(0), # needs to be (num_regions, hidden_size )
+                                                                    attention_mask1=text_attention_mask, 
+                                                                    attention_mask2=vision_attention_mask,
+                                                                    output_all_encoded_layers=False)
+                              # print("all text returned:", all_text)
+                              # print("all text return shape", all_text.shape)
+                              # print("vision input returned:", vision_input)
+                              # print("vision input shape", vision_input.shape)
 
                             linear_projection_up_img = nn.Linear(1024, 2048).cuda(cuda_option)
                             linear_projection_up_text = nn.Linear(768, 2048).cuda(cuda_option)
@@ -403,16 +405,30 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             post_similarities.append(post_similarity)
                         else:
                             print("\nNo images for this step")
+                            # Change dimensions of embeddings (2048 -> 1024) to match VilBERT encoder
+                            linear_projection_down_img = nn.Linear(2048, 1024).cuda(cuda_option)
+                            linear_projection_down_text = nn.Linear(2048, 768).cuda(cuda_option)
+
+                            all_text = linear_projection_down_text(all_text) # has to be 768?
+
                             # all black image (all zeros) 
                             vision_input = torch.zeros((1,1,1024)).cuda(cuda_option)
-                            text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
-                            vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
 
-                            all_text, vision_input = multicoder(all_text.unsqueeze(0),
-                                                                vision_input, 
-                                                                text_attention_mask, 
-                                                                vision_attention_mask,
-                                                                output_all_encoded_layers=False)
+                            with torch.no_grad():
+                              text_attention_mask = torch.ones((1,1, all_text.shape[0])).cuda(cuda_option)
+                              vision_attention_mask = torch.ones((1,1,1)).cuda(cuda_option)
+
+                              
+                              all_text, vision_input = multicoder(all_text.unsqueeze(0),
+                                                                  vision_input, 
+                                                                  text_attention_mask, 
+                                                                  vision_attention_mask,
+                                                                  output_all_encoded_layers=False)
+
+
+                            linear_projection_up_text = nn.Linear(768, 2048).cuda(cuda_option)
+
+                            all_text = linear_projection_up_text(all_text.squeeze(-1))
 
                             image_result = torch.zeros(2048).cuda(cuda_option)
                             sentences_result = LSTM_Lang(all_text)[-1][-1]

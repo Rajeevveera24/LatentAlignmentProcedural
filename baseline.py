@@ -20,6 +20,8 @@ from src.bertModel import NoPosLXRTEncoder
 
 from utils import read_data, parse_arguments, TextPreprocessor, embedding, prepare_language, prepare_data
 
+EMBED_SIZE = 384
+
 def prepare_answer(texts, embedder, cuda_option):
     data = []
     for text in texts:
@@ -29,7 +31,7 @@ def prepare_answer(texts, embedder, cuda_option):
         if is_cuda:
             position = position.cuda(cuda_option)
         if len(embed.shape) == 0:
-            embed = torch.zeros(2048).cuda(cuda_option)
+            embed = torch.zeros(EMBED_SIZE).cuda(cuda_option)
         if len(position.shape) == 0:
             position = torch.zeros(4).cuda(cuda_option)
         if is_cuda:
@@ -170,7 +172,9 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
 
             results = []
             
-            try:                
+            try:
+                pre_similarities = []
+                post_similarities = []               
                 for _it in range(len(instructions)):
                     
                     sentences = text_preprocessor.preprocess(instructions[_it])
@@ -192,6 +196,19 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                         all_text = textTransformer(all_text)
 
                         if len(img_data[_it]):
+                            sentences_result = LSTM_Lang(all_text.unsqueeze(0))[-1][-1]
+                            image_result = LSTM_Img(img_data[_it].unsqueeze(0))[-1][-1]
+                            t1 = sentences_result.detach().cpu().numpy()
+                            t2 = image_result.detach().cpu().numpy()
+                            sentence_embedding = t1
+                            image_embedding = t2
+                            # print(sentence_embedding.shape, image_embedding.shape)
+                            dot_product = np.dot(sentence_embedding, image_embedding.T)
+                            norm_a = np.linalg.norm(sentence_embedding)
+                            norm_b = np.linalg.norm(image_embedding)
+                            pre_similarity = dot_product / (norm_a * norm_b)
+                            pre_similarities.append(pre_similarity)
+                            
                             all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),
                                                                 visn_feats=img_data[_it].unsqueeze(0), 
                                                                 visn_attention_mask=None, 
@@ -199,10 +216,22 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                             
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
                             image_result = LSTM_Img(vision_input)[-1][-1]
+                            
+                            t1 = sentences_result.detach().cpu().numpy()
+                            t2 = image_result.detach().cpu().numpy()
+                            sentence_embedding = t1
+                            image_embedding = t2
+                            # print(sentence_embedding.shape, image_embedding.shape)
+                            dot_product = np.dot(sentence_embedding, image_embedding.T)
+                            norm_a = np.linalg.norm(sentence_embedding)
+                            norm_b = np.linalg.norm(image_embedding)
+                            post_similarity = dot_product / (norm_a * norm_b)
+                            post_similarities.append(post_similarity)
+                            
                         else:
                             print("\nNo images for this step")
                             all_text, vision_input = multicoder(lang_feats=all_text.unsqueeze(0),visn_feats=None, visn_attention_mask=None, lang_attention_mask=None)
-                            image_result = torch.zeros(2048).cuda(cuda_option)
+                            image_result = torch.zeros(EMBED_SIZE).cuda(cuda_option)
                             sentences_result = LSTM_Lang(all_text)[-1][-1]
 
                     value = contextTransformer(torch.cat((sentences_result, question_result, image_result)))
@@ -257,6 +286,8 @@ def execute(_m, _n, _s, _iteration, dataset, base_image_path, log_file, cuda_opt
                     print("correct Answer", file=logger)
                 else:
                     print("wrong Answer", file=logger)
+                
+                print(np.mean(np.array(pre_similarities)), np.mean(np.array(post_similarities)), file=logger)
 
                 checking_p2 = torch.tensor(print_results_list).topk(2)[1]
                 if sample['answer'] in checking_p2:
@@ -384,7 +415,7 @@ if __name__ == "__main__":
     text_preprocessor = TextPreprocessor()
 
     selected_embedding = FlairEmbeddings("news-forward")
-    embed_dim = 2048
+    embed_dim = EMBED_SIZE
 
     flair = FlairEmbeddings("news-forward")
 
@@ -400,21 +431,21 @@ if __name__ == "__main__":
 
     is_cuda = torch.cuda.is_available()
 
-    LSTM_Lang = LSTMFlair(input_dim=embed_dim, hidden_dim=2048, batch_size = 1) 
-    LSTM_Img = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
-    LSTM_Answer = LSTMFlair(input_dim=embed_dim+4, hidden_dim=2048, batch_size = 1)  
+    LSTM_Lang = LSTMFlair(input_dim=embed_dim, hidden_dim=EMBED_SIZE, batch_size = 1) 
+    LSTM_Img = LSTMFlair(input_dim=EMBED_SIZE, hidden_dim=EMBED_SIZE, batch_size = 1)
+    LSTM_Answer = LSTMFlair(input_dim=embed_dim+4, hidden_dim=EMBED_SIZE, batch_size = 1)  
 
-    multicoder = NoPosLXRTEncoder(visual_feat_dim=2048, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=2048, intermediate_size=2048)
-    LSTM_Lang = LSTMFlair(input_dim=2048, hidden_dim=2048, batch_size = 1)
-    textTransformer = FullyConnected(dims = [embed_dim, 2048, 2048], layers = 2)
-    contextTransformer = ResidualFullyConnected(dims = [6144, 2048, 1024, 512, 512], layers = 4)
-    answerTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
-    imageTransformer = ResidualFullyConnected(dims = [2048, 1024, 1024, 512, 512], layers = 4)
+    multicoder = NoPosLXRTEncoder(visual_feat_dim=EMBED_SIZE, drop=0.0, l_layers=3, x_layers=2, r_layers=1, num_attention_heads=4, hidden_size=EMBED_SIZE, intermediate_size=EMBED_SIZE)
+    LSTM_Lang = LSTMFlair(input_dim=EMBED_SIZE, hidden_dim=EMBED_SIZE, batch_size = 1)
+    textTransformer = FullyConnected(dims = [embed_dim, EMBED_SIZE, EMBED_SIZE], layers = 2)
+    contextTransformer = ResidualFullyConnected(dims = [EMBED_SIZE * 3, EMBED_SIZE, EMBED_SIZE//2, EMBED_SIZE//4, EMBED_SIZE//4], layers = 4)
+    answerTransformer = ResidualFullyConnected(dims = [EMBED_SIZE, EMBED_SIZE//2, EMBED_SIZE//2, EMBED_SIZE//4, EMBED_SIZE//4], layers = 4)
+    imageTransformer = ResidualFullyConnected(dims = [EMBED_SIZE, EMBED_SIZE//2, EMBED_SIZE//2, EMBED_SIZE//4, EMBED_SIZE//4], layers = 4)
     
     train_image_ids_map = 'data/train_image_id_mapping.json'
     test_image_ids_map = 'data/test_image_id_mapping.json'
-    train_embeddings_load_path = 'data/embeddings/images/train_image_embeddings_resnet50.npy'
-    test_embeddings_load_path = 'data/embeddings/images/test_image_embeddings_resnet50.npy'
+    train_embeddings_load_path = 'data/embeddings/images/train_image_embeddings_384.npy'
+    test_embeddings_load_path = 'data/embeddings/images/test_image_embeddings_384.npy'
     
     if _set == "train":
         

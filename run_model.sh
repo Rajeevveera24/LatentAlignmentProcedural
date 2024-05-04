@@ -1,8 +1,11 @@
 #!/bin/bash
 
 # python main.py -i 1 -n 100 -m test -s test -l False -c 0 -p save/ -f outputs/log.txt -a 7 -e 2 -o all -r 0.001 -x True
-python main_copy.py -i 5 -n 1500 -m train -s train -l False -c 0 -p save/baseline_one/ -f outputs/log.txt -a 8 -e 2 -o one -r 0.001 -x True
-python main_copy.py -i 5 -n 1500 -m train -s train -l False -c 0 -p save/baseline_all/ -f outputs/log.txt -a 8 -e 2 -o all -r 0.001 -x True
+# python main_copy.py -i 5 -n 1500 -m train -s train -l False -c 0 -p save/baseline_one/ -f outputs/log.txt -a 8 -e 2 -o one -r 0.001 -x True
+# python main_copy.py -i 5 -n 1500 -m train -s train -l False -c 0 -p save/baseline_all/ -f outputs/log.txt -a 8 -e 2 -o all -r 0.001 -x True
+
+
+# python baseline.py -i 5 -n 1500 -m train -s train -c 0 -p save/baseline_new/ -f outputs/log_new.txt -a 8 -e 2 -o one -r 0.001 -x True
 
 # -i for number of iterations
 # -n for number of samples in use
@@ -17,3 +20,9 @@ python main_copy.py -i 5 -n 1500 -m train -s train -l False -c 0 -p save/baselin
 # -o For specifying the loss mode ("one" for objective 1 and "all" for objective 2)
 # -r for specifying the learning rate
 # -x for enabling or desabling the modified max pooling
+
+
+python create_image_embeddings.py --test_embeddings_path data/embeddings/images/test_image_embeddings_384.npy --train_embeddings_path data/embeddings/images/train_image_embeddings_384.npy
+
+python baseline.py -i 5 -n 1500 -m train -s train -c 0 -p save/baseline_new/ -f outputs/log_new.txt -a 8 -e 2 -o one -r 0.001 -x True
+python baseline.py -i 1 -n 700 -m test -s test -l True -c 0 -p save/baseline_new/ -f outputs/log_new_test.txt -a 8 -e 2 -o one -r 0.001 -x True

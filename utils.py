@@ -8,7 +8,14 @@ import torch
 from flair.data import Sentence
 from pycorenlp import StanfordCoreNLP
 
+from sentence_transformers import SentenceTransformer
 
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+def get_sentence_embeddings(sentences):
+    # Generate embeddings for the provided list of sentences
+    embeddings = model.encode(sentences)
+    return embeddings
 
 class TextPreprocessor:
 
@@ -66,10 +73,18 @@ class RecipeDataset(torch.utils.data.Dataset):
     
 def embedding(text, embedder):
     sentence = Sentence(text)
-    embedder.embed(sentence)
+    # print(text)
+    # print(sentence)
+    # print(sentence)
+    embedded_sentence = get_sentence_embeddings([text])
+    # embedder.embed(sentence)
     if not sentence:
-        return torch.zeros(2048)
-    return torch.stack([w.embedding for w in sentence])
+        return torch.zeros(384)
+    # ret = torch.stack([w.embedding for w in sentence])
+    ret_diff = torch.tensor(embedded_sentence)
+    # print(ret.shape, ret_diff.shape)
+    # return torch.stack([w.embedding for w in sentence])
+    return ret_diff
 
 def prepare_language(text, embedder, cuda_option):
     data = embedding(text, embedder)

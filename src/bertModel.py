@@ -31,6 +31,9 @@ import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss, SmoothL1Loss
 
+
+EMBED_SIZE = 384
+
 def gelu(x):
     """Implementation of the gelu activation function.
         For information: OpenAI GPT's gelu is slightly different (and gives slightly different results):
@@ -92,7 +95,7 @@ class BertConfig(object):
                 probabilities.
             max_position_embeddings: The maximum sequence length that this model might
                 ever be used with. Typically set this to something large just in case
-                (e.g., 512 or 1024 or 2048).
+                (e.g., 512 or 1024 or EMBED_SIZE).
             type_vocab_size: The vocabulary size of the `token_type_ids` passed into
                 `BertModel`.
             initializer_range: The sttdev of the truncated_normal_initializer for
@@ -159,7 +162,7 @@ class BertAttention(nn.Module):
         self.attention_head_size = int(hidden_size / num_attention_heads)
         self.all_head_size = self.num_attention_heads * self.attention_head_size
 
-        # visual_dim = 2048
+        # visual_dim = EMBED_SIZE
         if ctx_dim is None:
             ctx_dim = hidden_size
         self.query = nn.Linear(hidden_size, self.all_head_size)
@@ -243,7 +246,7 @@ class BertSelfattLayer(nn.Module):
 
 
 class BertIntermediate(nn.Module):
-    def __init__(self, hidden_size=3072, intermediate_size=2048):
+    def __init__(self, hidden_size=3072, intermediate_size=EMBED_SIZE):
         super(BertIntermediate, self).__init__()
         self.dense = nn.Linear(hidden_size, intermediate_size)
         self.intermediate_act_fn = GeLU()
@@ -255,7 +258,7 @@ class BertIntermediate(nn.Module):
 
 
 class BertOutput(nn.Module):
-    def __init__(self, hidden_size=3072, intermediate_size=2048, drop=0.0):
+    def __init__(self, hidden_size=3072, intermediate_size=EMBED_SIZE, drop=0.0):
         super(BertOutput, self).__init__()
         self.dense = nn.Linear(intermediate_size, hidden_size)
         self.LayerNorm = BertLayerNorm(hidden_size, eps=1e-8)
@@ -270,7 +273,7 @@ class BertOutput(nn.Module):
 
 
 class BertLayer(nn.Module):
-    def __init__(self, num_attention_heads=2, hidden_size=3072, drop=0.0, intermediate_size=2048):
+    def __init__(self, num_attention_heads=2, hidden_size=3072, drop=0.0, intermediate_size=EMBED_SIZE):
         super(BertLayer, self).__init__()
         self.attention = BertSelfattLayer(num_attention_heads=num_attention_heads, hidden_size=hidden_size, drop=drop)
         self.intermediate = BertIntermediate(hidden_size=hidden_size, intermediate_size=intermediate_size)
@@ -291,7 +294,7 @@ class BertLayer(nn.Module):
 
 
 class LXRTXLayer(nn.Module):
-    def __init__(self, num_attention_heads=8, hidden_size=3072, drop=0.0, intermediate_size=2048):
+    def __init__(self, num_attention_heads=8, hidden_size=3072, drop=0.0, intermediate_size=EMBED_SIZE):
         super().__init__()
         # The cross-attention Layer
         self.visual_attention = BertCrossattLayer(num_attention_heads=num_attention_heads, hidden_size=hidden_size, drop=drop)
@@ -372,7 +375,7 @@ class VisualFeatEncoder(nn.Module):
 
 
 class LXRTEncoder(nn.Module):
-    def __init__(self, visual_feat_dim=2048, visual_pos_dim=8, drop=0.0, l_layers=9, x_layers=5, r_layers=5, num_attention_heads=4, hidden_size=3072,intermediate_size=2048):
+    def __init__(self, visual_feat_dim=EMBED_SIZE, visual_pos_dim=8, drop=0.0, l_layers=9, x_layers=5, r_layers=5, num_attention_heads=4, hidden_size=3072,intermediate_size=EMBED_SIZE):
         super().__init__()
 
         # Obj-level image embedding layer
@@ -593,7 +596,7 @@ class NoPosVisualFeatEncoder(nn.Module):
 
 
 class NoPosLXRTEncoder(nn.Module):
-    def __init__(self, visual_feat_dim=2048, drop=0.0, l_layers=9, x_layers=5, r_layers=5, num_attention_heads=4, hidden_size=3072,intermediate_size=2048):
+    def __init__(self, visual_feat_dim=EMBED_SIZE, drop=0.0, l_layers=9, x_layers=5, r_layers=5, num_attention_heads=4, hidden_size=3072,intermediate_size=EMBED_SIZE):
         super().__init__()
 
         # Obj-level image embedding layer

@@ -1,0 +1,724 @@
+
+ --------------- 
+ Start of the model execution. 
+{
+  "mode": "test",
+  "number": 100,
+  "iteration": 1,
+  "set": "test",
+  "load": true,
+  "cuda": 0,
+  "path": "save/baseline_one/",
+  "file": "outputs/log_2.txt",
+  "architecture": 8,
+  "embedding": 2,
+  "loss": "one",
+  "rate": 0.001,
+  "score": null,
+  "maxpool": true
+}
+ start the training 
+-----------------
+Start of the iteration 0. 
+sample number:  558
+sample id:  how-to-properly-eat-jello
+the matching result is:  [0.33342182636260986, 0.4706096947193146, 0.5310264229774475, 0.4899844527244568]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.013583814 0.029842399
+sample number:  202
+sample id:  wonton-zombie-brain-soup
+the matching result is:  [0.22966766357421875, 0.49332642555236816, 0.5795573592185974, 0.2492392659187317]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.013148613 0.028048288
+sample number:  180
+sample id:  electric-guitar-cake
+the matching result is:  [0.2768184542655945, 0.4530009925365448, 0.5344219207763672, 0.4507268965244293]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.0066911536 0.02276746
+sample number:  552
+sample id:  water-kefir
+the matching result is:  [0.3368466794490814, 0.28793033957481384, 0.569473922252655, 0.4474116265773773]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.0114289615 0.023419023
+sample number:  98
+sample id:  banana-cake-bread
+the matching result is:  [0.25333747267723083, 0.46751242876052856, 0.3146638870239258, 0.5772906541824341]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.007947098 0.028287634
+sample number:  626
+sample id:  life-by-chocolate-lowfat-chocolate-brownie-pie-m
+the matching result is:  [0.19345083832740784, 0.5228482484817505, 0.5196506977081299, 0.5915716886520386]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.016857836 0.019799711
+sample number:  667
+sample id:  vegan-mediterranean-taquito
+the matching result is:  [0.45894110202789307, 0.2806018888950348, 0.5783371925354004, 0.503816545009613]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.01659782 0.019197961
+sample number:  480
+sample id:  no-bake-oreo-cookies-cream-cheesecake
+the matching result is:  [0.42378026247024536, 0.2961156368255615, 0.5324717164039612, 0.254513680934906]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.0070531596 0.018744696
+sample number:  476
+sample id:  my-super-simple-shortcut-garlic-bread
+the matching result is:  [0.35796770453453064, 0.5375136733055115, 0.49692949652671814, 0.5005708336830139]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.015360745 0.029172301
+sample number:  239
+sample id:  valentine-quotlove-trainquot-cake
+the matching result is:  [0.4190925061702728, 0.3467690944671631, 0.5305716395378113, 0.4884682893753052]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.010924352 0.026089013
+sample number:  772
+sample id:  sb-swedish-pancakes
+the matching result is:  [0.2902977466583252, 0.3549569845199585, 0.5191951990127563, 0.532569944858551]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.013769815 0.011027895
+sample number:  277
+sample id:  raw-coconut-tacos-with-nectarine-walnut-filling
+the matching result is:  [0.5607144832611084, 0.25244471430778503, 0.5075917840003967, 0.5190251469612122]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.019010223 0.02324872
+sample number:  492
+sample id:  chicken-salad-sandwich
+the matching result is:  [0.2577768862247467, 0.47249454259872437, 0.6060342788696289, 0.3460758924484253]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.006687959 0.019921418
+sample number:  716
+sample id:  spicy-potato-fry
+the matching result is:  [0.2666422128677368, 0.452193945646286, 0.27026280760765076, 0.493895560503006]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.024121167 0.017505636
+sample number:  336
+sample id:  easy-cheesey-garlic-pull-apart-bread
+the matching result is:  [0.3423032760620117, 0.4904751777648926, 0.5080784559249878, 0.28527286648750305]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.013816909 0.022553978
+sample number:  736
+sample id:  easy-peach-cobbler-cooked-in-a-dutch-oven
+the matching result is:  [0.30423757433891296, 0.4828808307647705, 0.3393232524394989, 0.5702214241027832]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.02150773 0.02427141
+sample number:  487
+sample id:  fresh-blueberry-and-blackberry-tart
+the matching result is:  [0.45140090584754944, 0.2993999719619751, 0.24582771956920624, 0.5646982192993164]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.018291716 0.018600088
+sample number:  651
+sample id:  deep-dish-taco-pie
+the matching result is:  [0.5530474185943604, 0.24352063238620758, 0.5045382380485535, 0.4166845679283142]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.024002302 0.0197977
+sample number:  689
+sample id:  valentine-quotlove-trainquot-cake
+the matching result is:  [0.40525272488594055, 0.4728631377220154, 0.4620923697948456, 0.45430102944374084]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.010924352 0.026089013
+sample number:  410
+sample id:  the-porkinator
+the matching result is:  [0.49787166714668274, 0.501806378364563, 0.5402960777282715, 0.5530206561088562]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.025877658 0.023220196
+sample number:  875
+sample id:  how-to-make-the-uss-enterpi
+the matching result is:  [0.2843322157859802, 0.5861268043518066, 0.4808714985847473, 0.45934003591537476]
+the predicted answer:  1
+The answer is:  3
+wrong Answer
+-0.012777573 0.017176628
+sample number:  260
+sample id:  moms-delicious-homemade-bread
+the matching result is:  [0.25592002272605896, 0.5671147108078003, 0.5710493326187134, 0.4045635759830475]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.011511017 0.0164479
+sample number:  159
+sample id:  sugar-quill-with-edible-ink-and-parchment
+the matching result is:  [0.22159385681152344, 0.5836746096611023, 0.5785067677497864, 0.49271509051322937]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.007998762 0.019139549
+sample number:  926
+sample id:  double-trouble-waffles
+the matching result is:  [0.495898962020874, 0.5833245515823364, 0.28211119771003723, 0.4861234724521637]
+the predicted answer:  1
+The answer is:  3
+wrong Answer
+-0.011649273 0.025066344
+sample number:  213
+sample id:  carrot-and-swede-potch-mash
+the matching result is:  [0.3097550868988037, 0.5336248874664307, 0.509908139705658, 0.4581429958343506]
+the predicted answer:  1
+The answer is:  3
+wrong Answer
+-0.010921466 0.019302461
+sample number:  495
+sample id:  3-ingredients-light-frozen-yogurt
+the matching result is:  [0.2350623607635498, 0.3278062343597412, 0.5666170120239258, 0.44467806816101074]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.008401554 0.018185407
+sample number:  238
+sample id:  sierpinski-triangle-fractal-cookies
+the matching result is:  [0.22212406992912292, 0.5217347145080566, 0.4044189751148224, 0.5762343406677246]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.011657716 0.01973361
+sample number:  305
+sample id:  frozen-grapes-1
+the matching result is:  [0.2924558222293854, 0.5462855696678162, 0.5394293665885925, 0.493961364030838]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.011425499 0.02053982
+sample number:  259
+sample id:  how-to-grillcook-on-a-campfire
+the matching result is:  [0.3944903016090393, 0.3624918758869171, 0.35967501997947693, 0.47872284054756165]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.0127127 0.025932983
+sample number:  66
+sample id:  easy-meals-1-italian-sausage-balls-and-3-cheese-to
+the matching result is:  [0.3038725256919861, 0.43789705634117126, 0.4500908851623535, 0.4361211657524109]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.010913714 0.025766954
+sample number:  474
+sample id:  tomato-chutney
+the matching result is:  [0.5127522945404053, 0.23747774958610535, 0.5007823705673218, 0.5937668681144714]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.015587645 0.021961963
+sample number:  787
+sample id:  wonton-lasagna-cups
+the matching result is:  [0.4482954144477844, 0.5394913554191589, 0.5420728921890259, 0.4531925916671753]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.010536447 0.020340307
+sample number:  881
+sample id:  broiled-grapefruit-recipe
+the matching result is:  [0.25038066506385803, 0.6065347194671631, 0.3762308657169342, 0.4405359923839569]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.0070785307 0.012762951
+sample number:  778
+sample id:  dirty-beary-yogurt-based-dip
+the matching result is:  [0.3455471098423004, 0.480345219373703, 0.6013990044593811, 0.5238344073295593]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.008930336 0.024817962
+sample number:  571
+sample id:  easy-savoury-party-muffins
+the matching result is:  [0.22238494455814362, 0.4420011639595032, 0.4684978425502777, 0.5633993744850159]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.008974299 0.020112481
+sample number:  692
+sample id:  pavlova
+the matching result is:  [0.2799924314022064, 0.4673842489719391, 0.4572276771068573, 0.39298170804977417]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.011845699 0.018332195
+sample number:  135
+sample id:  blueberry-cream-cheese-crepes
+the matching result is:  [0.5093764662742615, 0.2529071569442749, 0.5351501703262329, 0.3046862483024597]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.02274523 0.020928083
+sample number:  111
+sample id:  poison-apple-cupcakes
+the matching result is:  [0.23823891580104828, 0.5698856115341187, 0.44213366508483887, 0.49067971110343933]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.018811358 0.019647386
+sample number:  237
+sample id:  an-easy-way-to-cook-fluffy-rice
+the matching result is:  [0.40295353531837463, 0.38460788130760193, 0.4641851782798767, 0.27104994654655457]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.015546945 0.008564831
+sample number:  930
+sample id:  layered-red-velvet-mug-cake
+the matching result is:  [0.35093602538108826, 0.47179746627807617, 0.38968372344970703, 0.5132395029067993]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.008144877 0.0238444
+sample number:  762
+sample id:  turbo-cook-frozen-food
+the matching result is:  [0.45019060373306274, 0.49103474617004395, 0.5705106854438782, 0.5819099545478821]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.013367768 0.02162868
+sample number:  911
+sample id:  guacamole-3
+the matching result is:  [0.42842739820480347, 0.29916152358055115, 0.5115587115287781, 0.41215765476226807]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.014700598 0.019870887
+sample number:  666
+sample id:  spooky-marshmallow-pops
+the matching result is:  [0.3039408028125763, 0.4277050793170929, 0.5895461440086365, 0.337929904460907]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.015031068 0.016570505
+sample number:  604
+sample id:  drunken-linguine-with-parmasan-and-olive-oil
+the matching result is:  [0.5124858021736145, 0.1913461536169052, 0.4902478754520416, 0.41375836730003357]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.013499705 0.020565173
+sample number:  482
+sample id:  watermelon-sherbet-watermelon
+the matching result is:  [0.2980474829673767, 0.4287441670894623, 0.531981348991394, 0.5554248094558716]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.022724627 0.015538614
+sample number:  272
+sample id:  gluten-free-pumpkin-bread-can-be-yummilicious
+the matching result is:  [0.370034784078598, 0.5237445831298828, 0.5034656524658203, 0.5788450241088867]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.0062882714 0.0088690035
+sample number:  592
+sample id:  brunch-for-one
+the matching result is:  [0.5684576630592346, 0.23974251747131348, 0.5481314659118652, 0.5787938237190247]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.014751507 0.020102268
+sample number:  618
+sample id:  mint-chocolate-chip-valentine-card
+the matching result is:  [0.20199961960315704, 0.5426658987998962, 0.5208329558372498, 0.4436810314655304]
+the predicted answer:  1
+The answer is:  2
+wrong Answer
+-0.0058388133 0.02245001
+sample number:  121
+sample id:  how-to-make-sausage-1
+the matching result is:  [0.5881974101066589, 0.5881974101066589, 0.33953046798706055, 0.5654270052909851]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.0066719027 0.027013682
+sample number:  190
+sample id:  snowmen-oreo-balls
+the matching result is:  [0.37285247445106506, 0.4961492419242859, 0.4763752222061157, 0.4745613932609558]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.01286541 0.024440313
+sample number:  850
+sample id:  outbacks-creamy-onion-soup
+the matching result is:  [0.22051116824150085, 0.2829771637916565, 0.46477922797203064, 0.5203095078468323]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.026068887 0.012009807
+sample number:  646
+sample id:  super-easy-nacho-cheese-sauce
+the matching result is:  [0.33022063970565796, 0.47000086307525635, 0.5266770720481873, 0.23993560671806335]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.02752527 0.017756166
+sample number:  491
+sample id:  tiramisu-pie
+the matching result is:  [0.3790268898010254, 0.35243332386016846, 0.5326383709907532, 0.34664034843444824]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.011944811 0.0232333
+sample number:  877
+sample id:  how-to-safely-fry-a-turkey
+the matching result is:  [0.42769157886505127, 0.42030230164527893, 0.48689624667167664, 0.38434121012687683]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.0013203276 0.016278613
+sample number:  339
+sample id:  chocolate-lollipops
+the matching result is:  [0.544490396976471, 0.2898923456668854, 0.3836628794670105, 0.49773213267326355]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.010221765 0.020110022
+sample number:  76
+sample id:  snow-ice-cream-3
+the matching result is:  [0.3324050307273865, 0.5732396841049194, 0.4682086408138275, 0.3606581687927246]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.015068862 0.011448646
+sample number:  28
+sample id:  scrambled-egg-mini-samosas
+the matching result is:  [0.2982615828514099, 0.5693284273147583, 0.4963209629058838, 0.41020041704177856]
+the predicted answer:  1
+The answer is:  3
+wrong Answer
+-0.022757702 0.027646683
+sample number:  619
+sample id:  samkak-kimbab
+the matching result is:  [0.2299606055021286, 0.5007556080818176, 0.5667454600334167, 0.3355119228363037]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.0234121 0.018033892
+sample number:  458
+sample id:  quick-and-easy-teriyaki-marinade
+the matching result is:  [0.32035544514656067, 0.4723292589187622, 0.5167553424835205, 0.5333577990531921]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.014801394 0.014664996
+sample number:  812
+sample id:  zombie-mozzarella-meal
+the matching result is:  [0.34858468174934387, 0.49836382269859314, 0.4570409655570984, 0.5933535695075989]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.008858349 0.018171016
+sample number:  838
+sample id:  dont-let-the-tomatoes-go-bad-marinara-sauce
+the matching result is:  [0.35064277052879333, 0.5363213419914246, 0.4880843758583069, 0.43444427847862244]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.009663491 0.01947374
+sample number:  566
+sample id:  beer-ice-cream
+the matching result is:  [0.5870991945266724, 0.27725672721862793, 0.5870991945266724, 0.3279273808002472]
+the predicted answer:  0
+The answer is:  2
+wrong Answer
+-0.014455381 0.025095409
+sample number:  314
+sample id:  perfect-chewy-chocolate-chip-cookies
+the matching result is:  [0.19123460352420807, 0.5365648865699768, 0.42075225710868835, 0.5517200231552124]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.016890423 0.01976417
+sample number:  92
+sample id:  pumpkin-spice-creamer
+the matching result is:  [0.1727643460035324, 0.4801536500453949, 0.494981050491333, 0.5874791741371155]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.013058651 0.020830715
+sample number:  573
+sample id:  sea-salted-caramel-pretzels
+the matching result is:  [0.21573710441589355, 0.5015237927436829, 0.41154491901397705, 0.5329381823539734]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.015981436 0.012019008
+sample number:  837
+sample id:  fridge-cleaner-spaghetti-pie
+the matching result is:  [0.23124483227729797, 0.6058761477470398, 0.5853267908096313, 0.47981327772140503]
+the predicted answer:  1
+The answer is:  2
+wrong Answer
+-0.018333206 0.018289378
+sample number:  645
+sample id:  peanut-butter-cup-cookies-1
+the matching result is:  [0.2012721300125122, 0.5745111107826233, 0.2097029983997345, 0.5134081840515137]
+the predicted answer:  1
+The answer is:  3
+wrong Answer
+-0.021563744 0.022652637
+sample number:  533
+sample id:  yankee-moogoogaipan
+the matching result is:  [0.520269513130188, 0.421637624502182, 0.2990875244140625, 0.4296434819698334]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.0146938 0.010941711
+sample number:  617
+sample id:  watermelon-salsa
+the matching result is:  [0.5840163826942444, 0.5896355509757996, 0.2963758111000061, 0.28677207231521606]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.011515019 0.024502983
+sample number:  717
+sample id:  chocolate-buns
+the matching result is:  [0.6004863977432251, 0.3597191572189331, 0.5564979910850525, 0.3798556923866272]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.018957287 0.017475642
+sample number:  367
+sample id:  4-ingredient-15-minute-peanut-butter-cups-nutel
+the matching result is:  [0.23198701441287994, 0.5369606018066406, 0.24695554375648499, 0.6151815056800842]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.019022943 0.024251206
+sample number:  394
+sample id:  traditional-szechuan-chicken
+the matching result is:  [0.1938132494688034, 0.5221958756446838, 0.2859991192817688, 0.37312906980514526]
+the predicted answer:  1
+The answer is:  1
+correct Answer
+-0.011651121 0.021010328
+sample number:  188
+sample id:  tropical-chili-cream-puffs
+the matching result is:  [0.4851909577846527, 0.3021708130836487, 0.5229666233062744, 0.520727813243866]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.0069141537 0.014728322
+sample number:  856
+sample id:  lightning-ballz
+the matching result is:  [0.35252225399017334, 0.3473083972930908, 0.4145110845565796, 0.4463913142681122]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.008094716 0.02474414
+sample number:  180
+sample id:  electric-guitar-cake
+the matching result is:  [0.2768184542655945, 0.4530009925365448, 0.5344219207763672, 0.4507268965244293]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.0066911536 0.02276746
+sample number:  702
+sample id:  chocolate-prince
+the matching result is:  [0.3266479969024658, 0.4976828694343567, 0.4618786573410034, 0.45531710982322693]
+the predicted answer:  1
+The answer is:  2
+wrong Answer
+-0.015008746 0.025413861
+sample number:  253
+sample id:  american-flag-cookies
+the matching result is:  [0.3676201105117798, 0.33774417638778687, 0.48609450459480286, 0.5408076643943787]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.020535687 0.019881243
+sample number:  164
+sample id:  khara-boondi-savory-fried-balls
+the matching result is:  [0.36733731627464294, 0.46852999925613403, 0.5564357042312622, 0.4112733006477356]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.017700346 0.019920591
+sample number:  164
+sample id:  khara-boondi-savory-fried-balls
+the matching result is:  [0.36733731627464294, 0.46852999925613403, 0.5564357042312622, 0.4112733006477356]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.017700346 0.019920591
+sample number:  480
+sample id:  no-bake-oreo-cookies-cream-cheesecake
+the matching result is:  [0.42378026247024536, 0.2961156368255615, 0.5324717164039612, 0.254513680934906]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.0070531596 0.018744696
+sample number:  435
+sample id:  leftover-rice-rice-pudding
+the matching result is:  [0.49312496185302734, 0.2965553104877472, 0.3788742423057556, 0.5687596201896667]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.017277865 0.022370499
+sample number:  537
+sample id:  5-creative-and-delicious-uses-for-garlic-scapes
+the matching result is:  [0.2005760669708252, 0.45555204153060913, 0.31437844038009644, 0.50019770860672]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.017133798 0.020980319
+sample number:  176
+sample id:  garlic-infused-olive-oil-in-seconds
+the matching result is:  [0.31416788697242737, 0.37518954277038574, 0.5342089533805847, 0.20607876777648926]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.013198185 0.018694492
+sample number:  27
+sample id:  coffee-mocha-pie
+the matching result is:  [0.46728426218032837, 0.4832557439804077, 0.6025436520576477, 0.5696665048599243]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.024962181 0.020203272
+sample number:  946
+sample id:  how-to-make-easy-yet-decadent-cheesecake-cupcakes
+the matching result is:  [0.38871899247169495, 0.5397076606750488, 0.5366973280906677, 0.4993759095668793]
+the predicted answer:  1
+The answer is:  2
+wrong Answer
+-0.008358391 0.016074795
+sample number:  27
+sample id:  coffee-mocha-pie
+the matching result is:  [0.46728426218032837, 0.4832557439804077, 0.6025436520576477, 0.5696665048599243]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.024962181 0.020203272
+sample number:  435
+sample id:  leftover-rice-rice-pudding
+the matching result is:  [0.49312496185302734, 0.2965553104877472, 0.3788742423057556, 0.5687596201896667]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.017277865 0.022370499
+sample number:  895
+sample id:  dont-let-the-tomatoes-go-bad-marinara-sauce
+the matching result is:  [0.3777068257331848, 0.3644683361053467, 0.49944454431533813, 0.4466073513031006]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.009663491 0.01947374
+sample number:  513
+sample id:  shallow-fried-raw-banana-fritters
+the matching result is:  [0.29184579849243164, 0.4283826947212219, 0.5045521855354309, 0.5012902021408081]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.00904243 0.019628149
+sample number:  284
+sample id:  neros-smoothie-from-apicus-spiced-wine-recipe
+the matching result is:  [0.3936685621738434, 0.45272862911224365, 0.49438899755477905, 0.4254719614982605]
+the predicted answer:  2
+The answer is:  3
+wrong Answer
+-0.0053267223 0.026270745
+sample number:  859
+sample id:  oreo-cream-pie
+the matching result is:  [0.3068642318248749, 0.21842098236083984, 0.49672508239746094, 0.23810288310050964]
+the predicted answer:  2
+The answer is:  0
+wrong Answer
+-0.009255415 0.018714944
+sample number:  761
+sample id:  pickled-eggs
+the matching result is:  [0.41684848070144653, 0.539758026599884, 0.5804681777954102, 0.49197903275489807]
+the predicted answer:  2
+The answer is:  1
+wrong Answer
+-0.005614721 0.021762867
+sample number:  290
+sample id:  how-to-make-cake-pops-with-unique-flavors
+the matching result is:  [0.3440496325492859, 0.23758350312709808, 0.46422505378723145, 0.4465067982673645]
+the predicted answer:  2
+The answer is:  2
+correct Answer
+-0.008546789 0.018516555
+sample number:  592
+sample id:  brunch-for-one
+the matching result is:  [0.5684576630592346, 0.23974251747131348, 0.5481314659118652, 0.5787938237190247]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.014751507 0.020102268
+sample number:  72
+sample id:  peanut-butter-chocolate-covered-banana-bites
+the matching result is:  [0.2821007966995239, 0.4386082887649536, 0.31668680906295776, 0.5171748399734497]
+the predicted answer:  3
+The answer is:  3
+correct Answer
+-0.014099579 0.021747148
+sample number:  873
+sample id:  how-to-braai-meat-the-south-african-way
+the matching result is:  [0.5367629528045654, 0.4083544611930847, 0.4882436990737915, 0.571803629398346]
+the predicted answer:  3
+The answer is:  0
+wrong Answer
+-0.009958614 0.024641281
+sample number:  397
+sample id:  how-to-make-a-fruit-tart-easy-recipe
+the matching result is:  [0.30867376923561096, 0.523982584476471, 0.45140644907951355, 0.5532898306846619]
+the predicted answer:  3
+The answer is:  1
+wrong Answer
+-0.010727582 0.028342724
+sample number:  299
+sample id:  holiday-marzipan-fruits
+the matching result is:  [0.3068322539329529, 0.45758986473083496, 0.5180449485778809, 0.551289439201355]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.005607045 0.023708701
+sample number:  43
+sample id:  how-to-make-powdered-drink-mix-with-less-agitation
+the matching result is:  [0.5829704403877258, 0.23447945713996887, 0.39747288823127747, 0.4991890788078308]
+the predicted answer:  0
+The answer is:  0
+correct Answer
+-0.01977092 0.016455641
+sample number:  112
+sample id:  chili-recipe
+the matching result is:  [0.3369879722595215, 0.5478932857513428, 0.3783886730670929, 0.5894452333450317]
+the predicted answer:  3
+The answer is:  2
+wrong Answer
+-0.014976941 0.02114865
+The ratio of p2 correct is:  0.84
+The accuracy is 0.47. 

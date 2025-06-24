@@ -50,7 +50,7 @@ packaging==23.2
 pickle-mixin==1.0.2
 pillow==10.3.0
 pptree==3.1
-protobuf==4.25.3
+protobuf==4.25.8
 psutil==5.9.8
 pycorenlp==0.3.0
 pylzma==0.5.0
